@@ -1,0 +1,129 @@
+TaskInput.js
+
+import React, { useState } from 'eact';
+
+const TaskInput = () => {
+  const [task, setTask] = useState('');
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    // Add task to the list
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" value={task} onChange={(event) => setTask(event.target.value)} />
+      <button type="submit">Add Task</button>
+    </form>
+  );
+};
+
+export default TaskInput;
+
+
+TaskList.js
+
+import React from 'eact';
+import TaskItem from './TaskItem';
+
+const TaskList = ({ tasks }) => {
+  return (
+    <ul>
+      {tasks.map((task, index) => (
+        <TaskItem key={index} task={task} />
+      ))}
+    </ul>
+  );
+};
+
+export default TaskList;
+
+TaskItem.js
+
+
+
+import React from 'eact';
+
+const TaskItem = ({ task }) => {
+  return (
+    <li>
+      {task}
+      <button onClick={() => console.log('Delete task')}>Delete</button>
+      <button onClick={() => console.log('Edit task')}>Edit</button>
+    </li>
+  );
+};
+
+export default TaskItem;
+
+App.js
+
+import React, { useState, useEffect } from 'eact';
+import { createStore, combineReducers } from 'edux';
+import { Provider } from 'eact-redux';
+import TaskInput from './TaskInput';
+import TaskList from './TaskList';
+
+const taskReducer = (state = [], action) => {
+  switch (action.type) {
+    case 'ADD_TASK':
+      return [...state, action.task];
+    case 'DELETE_TASK':
+      return state.filter((task, index) => index!== action.index);
+    default:
+      return state;
+  }
+};
+
+const store = createStore(combineReducers({ tasks: taskReducer }));
+
+const App = () => {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    store.subscribe(() => {
+      setTasks(store.getState().tasks);
+    });
+  }, []);
+
+  return (
+    <Provider store={store}>
+      <TaskInput />
+      <TaskList tasks={tasks} />
+    </Provider>
+  );
+};
+
+export default App;
+
+index.js
+
+import React from 'eact';
+import ReactDOM from 'eact-dom';
+import App from './App';
+
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+
+index.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple React To-Do Application</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+</head>
+<body>
+  <div id="root"></div>
+  <script src="index.js"></script>
+</body>
+</html>
+
+
+
